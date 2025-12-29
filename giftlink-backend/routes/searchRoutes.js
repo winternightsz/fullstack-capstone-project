@@ -1,3 +1,4 @@
+/*jshint esversion: 8 */
 const express = require('express');
 const router = express.Router();
 const connectToDatabase = require('../models/db');
@@ -27,7 +28,7 @@ router.get('/', async (req, res, next) => {
         }
 
         // Fetch filtered gifts using the find(query) method. Make sure to use await and store the result in the `gifts` constant
-        const gifts = await collection.find(query).toArray()
+        const gifts = await collection.find(query).toArray();
 
         res.json(gifts);
     } catch (e) {
