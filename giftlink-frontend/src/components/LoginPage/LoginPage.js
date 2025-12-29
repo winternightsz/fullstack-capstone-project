@@ -22,7 +22,7 @@ function LoginPage() {
     }
     }, [navigate])
 
-const handleLogin = async () => {
+const handleLogin = async (e) => {
     e.preventDefault();
     const res = await fetch(`${urlConfig.backendUrl}/api/auth/login`, {
         method: 'POST',
