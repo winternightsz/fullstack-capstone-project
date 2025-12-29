@@ -52,4 +52,39 @@ router.post('/register', async (req, res) => {
     }
 });
 
+router.post('/login', async (req, res) => {
+    try {
+        // Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`.
+        const db = await connectToDatabase();
+
+        // Access MongoDB `users` collection
+        const collection = db.collection("users");
+
+        // Check for user credentials in database
+        const theUser = await collection.findOne({ email: req.body.email });
+
+        // Check if the password matches the encrypyted password and send appropriate message on mismatch
+        if (theUser) {
+            let result = await bcryptjs.compare(req.body.password, theUser.password)
+            if(!result) {
+                logger.error('Passwords do not match');
+                return res.status(404).json({ error: 'Wrong pasword' });
+            }
+            // Fetch user details from database
+            const userName = theUser.firstName;
+            const userEmail = theUser.email;
+
+            // Create JWT authentication if passwords match with user._id as payload
+            res.json({authtoken, userName, userEmail });
+        }else {
+        logger.error('User not found');
+        return res.status(404).json({ error: 'User not found' });
+        }
+
+    } catch (e) {
+         return res.status(500).send('Internal server error');
+
+    }
+});
+
 module.exports = router;
