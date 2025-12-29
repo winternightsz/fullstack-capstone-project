@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-
+import {urlConfig} from '../../config';
+import { useAppContext } from '../../context/AuthContext'; 
+import { useNavigate } from 'react-router-dom';
 import './RegisterPage.css';
 
 function RegisterPage() {
@@ -8,9 +10,46 @@ function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleRegister = async () => {
-        console.log("Register invoked")
-    }
+    const [showerr, setShowerr] = useState('');
+
+    //local variable for `navigate`   and `setIsLoggedIn`.
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
+
+const handleRegister = async () => {
+
+   
+
+      const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+            method: 'POST',
+            // Set headers
+            headers: {
+                'content-type': 'application/json',
+            },
+            // Set body to send user details
+            body: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password
+            })
+        });
+
+        const json = await response.json(); // Access data coming from fetch API
+
+        // Set user details
+        if (json.authtoken) {
+            sessionStorage.setItem('auth-token', json.authtoken);
+            sessionStorage.setItem('name', firstName);
+            sessionStorage.setItem('email', json.email);
+            setIsLoggedIn(true); //Set the state of user to logged in
+            navigate('/app')
+        }
+        
+        if (json.error) {
+        setShowerr(json.error);
+        }
+}
 
 return (
     <div className="container mt-5">
@@ -55,6 +94,7 @@ return (
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
+                        <div className="text-danger">{showerr}</div>
                     </div>
 
                     <div className="mb-4">
